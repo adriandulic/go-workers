@@ -8,7 +8,7 @@ import (
 )
 
 func MiddlewareStatsSpec(c gospec.Context) {
-	var job = (func(message *Msg) {
+	var job = (func(job Job) {
 		// noop
 	})
 
@@ -40,7 +40,7 @@ func MiddlewareStatsSpec(c gospec.Context) {
 	})
 
 	c.Specify("failed job", func() {
-		var job = (func(message *Msg) {
+		var job = (func(job Job) {
 			panic("AHHHH")
 		})
 
