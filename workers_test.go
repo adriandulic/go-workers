@@ -9,7 +9,7 @@ import (
 
 var called chan bool
 
-func myJob(message *Msg) {
+func myJob(job Job) {
 	called <- true
 }
 

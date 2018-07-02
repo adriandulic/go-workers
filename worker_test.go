@@ -39,8 +39,8 @@ func confirm(manager *manager) (msg *Msg) {
 func WorkerSpec(c gospec.Context) {
 	var processed = make(chan *Args)
 
-	var testJob = (func(message *Msg) {
-		processed <- message.Args()
+	var testJob = (func(job Job) {
+		processed <- job.Args()
 	})
 
 	manager := newManager("myqueue", testJob, 1)
@@ -121,7 +121,7 @@ func WorkerSpec(c gospec.Context) {
 		})
 
 		c.Specify("recovers and confirms if job panics", func() {
-			var panicJob = (func(message *Msg) {
+			var panicJob = (func(job Job) {
 				panic("AHHHHHHHHH")
 			})
 

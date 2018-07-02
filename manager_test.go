@@ -1,7 +1,7 @@
 package workers
 
 import (
-	"fmt"
+	"reflect"
 	"sync"
 	"time"
 
@@ -39,8 +39,8 @@ func (m *customMid) Trace() []string {
 func ManagerSpec(c gospec.Context) {
 	processed := make(chan *Args)
 
-	testJob := (func(message *Msg) {
-		processed <- message.Args()
+	testJob := (func(job Job) {
+		processed <- job.Args()
 	})
 
 	was := Config.Namespace
@@ -54,7 +54,9 @@ func ManagerSpec(c gospec.Context) {
 
 		c.Specify("sets job function", func() {
 			manager := newManager("myqueue", testJob, 10)
-			c.Expect(fmt.Sprint(manager.job), Equals, fmt.Sprint(testJob))
+			foo1 := reflect.ValueOf(manager.job)
+			foo2 := reflect.ValueOf(testJob)
+			c.Expect(foo1.Pointer(), Equals, foo2.Pointer())
 		})
 
 		c.Specify("sets worker concurrency", func() {
@@ -105,11 +107,11 @@ func ManagerSpec(c gospec.Context) {
 
 			drained := false
 
-			slowJob := (func(message *Msg) {
-				if message.ToJson() == sentinel.ToJson() {
+			slowJob := (func(job Job) {
+				if job.ToJson() == sentinel.ToJson() {
 					drained = true
 				} else {
-					processed <- message.Args()
+					processed <- job.Args()
 				}
 
 				time.Sleep(1 * time.Second)
