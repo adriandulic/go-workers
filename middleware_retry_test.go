@@ -1,6 +1,7 @@
 package workers
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/customerio/gospec"
@@ -23,6 +24,7 @@ func MiddlewareRetrySpec(c gospec.Context) {
 
 	was := Config.Namespace
 	Config.Namespace = "prod:"
+	fmt.Println("cc", Config)
 
 	c.Specify("puts messages in retry queue when they fail", func() {
 		message, _ := NewMsg("{\"jid\":\"2\",\"retry\":true}")

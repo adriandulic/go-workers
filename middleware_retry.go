@@ -7,10 +7,7 @@ import (
 	"time"
 )
 
-const (
-	DEFAULT_MAX_RETRY = 25
-	LAYOUT            = "2006-01-02 15:04:05 MST"
-)
+const layout = "2006-01-02 15:04:05 MST"
 
 type MiddlewareRetry struct{}
 
@@ -57,7 +54,7 @@ func (r *MiddlewareRetry) Call(queue string, message *Msg, next func() bool) (ac
 
 func retry(message *Msg) bool {
 	retry := false
-	max := DEFAULT_MAX_RETRY
+	max := Config.RetryLimit
 
 	if param, err := message.Get("retry").Bool(); err == nil {
 		retry = param
@@ -75,9 +72,9 @@ func incrementRetry(message *Msg) (retryCount int) {
 	retryCount = 0
 
 	if count, err := message.Get("retry_count").Int(); err != nil {
-		message.Set("failed_at", time.Now().UTC().Format(LAYOUT))
+		message.Set("failed_at", time.Now().UTC().Format(layout))
 	} else {
-		message.Set("retried_at", time.Now().UTC().Format(LAYOUT))
+		message.Set("retried_at", time.Now().UTC().Format(layout))
 		retryCount = count + 1
 	}
 
