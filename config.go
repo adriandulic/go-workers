@@ -10,8 +10,8 @@ import (
 const (
 	defaultRetryKey        = "goretry"
 	defaultScheduleJobsKey = "schedule"
-	defaultmaxRetries      = 11
-	defaultpollInterval    = 15
+	defaultMaxRetries      = 11
+	defaultPollInterval    = 15
 )
 
 type config struct {
@@ -32,8 +32,8 @@ func Configure(options map[string]string) {
 	var namespace string
 
 	retryKey := defaultRetryKey
-	pollInterval := defaultpollInterval
-	retryLimit := defaultmaxRetries
+	pollInterval := defaultPollInterval
+	retryLimit := defaultMaxRetries
 
 	if options["server"] == "" {
 		panic("Configure requires a 'server' option, which identifies a Redis instance")
