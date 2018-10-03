@@ -10,7 +10,8 @@ import (
 const (
 	defaultRetryKey        = "goretry"
 	defaultScheduleJobsKey = "schedule"
-	maxRetries             = 11
+	defaultmaxRetries      = 11
+	defaultpollInterval    = 15
 )
 
 type config struct {
@@ -29,39 +30,39 @@ var Config *config
 func Configure(options map[string]string) {
 	var poolSize int
 	var namespace string
-	var pollInterval int
-	var retryKey string
-	var scheduleKey string
-	retryLimit := maxRetries
+
+	retryKey := defaultRetryKey
+	pollInterval := defaultpollInterval
+	retryLimit := defaultmaxRetries
 
 	if options["server"] == "" {
 		panic("Configure requires a 'server' option, which identifies a Redis instance")
 	}
+
 	if options["process"] == "" {
 		panic("Configure requires a 'process' option, which uniquely identifies this instance")
 	}
+
 	if options["pool"] == "" {
 		options["pool"] = "1"
 	}
+
 	if options["namespace"] != "" {
 		namespace = options["namespace"] + ":"
 	}
+
 	if seconds, err := strconv.Atoi(options["poll_interval"]); err == nil {
 		pollInterval = seconds
-	} else {
-		pollInterval = 15
 	}
-	if options["retry_key"] == "" {
-		retryKey = defaultRetryKey
-	} else {
-		retryKey = options["retry_key"]
+
+	if customRetryKey, set := options["retry_key"]; set {
+		retryKey = customRetryKey
 	}
 
 	if customRetryLimit, err := strconv.Atoi(options["retry_limit"]); err == nil {
 		retryLimit = customRetryLimit
 	}
 
-	scheduleKey = defaultScheduleJobsKey
 	poolSize, _ = strconv.Atoi(options["pool"])
 
 	Config = &config{
@@ -69,7 +70,7 @@ func Configure(options map[string]string) {
 		namespace,
 		pollInterval,
 		retryKey,
-		scheduleKey,
+		defaultScheduleJobsKey,
 		retryLimit,
 		&redis.Pool{
 			MaxIdle:     poolSize,
