@@ -27,6 +27,7 @@ type config struct {
 
 var Config *config
 
+// Configure sets Config global variable
 func Configure(options map[string]string) {
 	var poolSize int
 	var namespace string
